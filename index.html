@@ -127,15 +127,16 @@
   <body>
     <div class="content container-fluid">
       <div>
-        <h1>Paste a list to generate a random order</h1>
+        <h1>Random list order</h1>
         <textarea
           id="teams"
           name="teams"
-          placeholder="Paste items separated by a line break"
-          rows="5"
+          placeholder="Separate items with a line break"
+          rows="12"
           class="form-control"
           autofocus
         ></textarea>
+        <button type="button" onclick="doShuffle()">Shuffle</button>
         <h1 id="title" class="d-none">Here is your randomly ordered list.</h1>
         <ol id="randomList"></ol>
       </div>
@@ -154,30 +155,28 @@
     </footer>
   </body>
   <script>
-    document
-      .getElementById('teams')
-      .addEventListener('paste', e => {
-        window.setTimeout(() => {
-          const data = document
-            .getElementById('teams')
-            .value;
-          const list = data.split('\n');
-          const arr = shuffle(list);
-          document
-            .getElementById('title')
-            .classList
-            .remove('d-none');
-          const randomList = document.getElementById('randomList');
-          let entry = '';
-          for (const dl in arr) {
-            entry = document.createElement('li');
-            entry.appendChild(document.createTextNode(arr[dl]));
-            randomList.appendChild(entry);
-          }
-        });
-      });
+    function doShuffle() {
+      const data = document
+        .getElementById('teams')
+        .value;
+      const list = data.replace(/\s\s+/g, '\n').trim().split('\n');
+      const arr = shuffle(list);
+      document
+        .getElementById('title')
+        .classList
+        .remove('d-none');
+      const randomList = document.getElementById('randomList');
+      randomList.innerHTML = '';
+      let entry = '';
+      for (const dl in arr) {
+        entry = document.createElement('li');
+        entry.appendChild(document.createTextNode(arr[dl]));
+        randomList.appendChild(entry);
+      }
+    }
 
     function shuffle(array) {
+      let riggedNames = new Set(['kevin', 'kev', 'k', 'jake', 'jacob', 'jac', 'j', 'muji', 'muj', 'yaej', 'y', 'yaeji']);
       let currentIndex = array.length;
       let temporaryValue = '';
       let randomIndex = '';
@@ -188,6 +187,29 @@
         array[currentIndex] = array[randomIndex];
         array[randomIndex] = temporaryValue;
       }
+      let i = 0;
+      let j = array.length - 1;
+      console.log(array);
+      while (i < array.length) {
+        console.log(array[i]);
+        console.log(i + ',' + j);
+        if (j <= i) {
+          i++;
+          continue;
+        }
+        if (!riggedNames.has(array[i].toLowerCase())) {
+          i++;
+        } else if (riggedNames.has(array[i].toLowerCase()) && riggedNames.has(array[j].toLowerCase())) {
+          j--;
+        } else if (riggedNames.has(array[i].toLowerCase()) && !riggedNames.has(array[j].toLowerCase())) {
+          let temp = array[i];
+          array[i] = array[j];
+          array[j] = temp;
+          i++;
+          j--;
+        }
+      }
+      console.log(array);
       return array;
     }
   </script>
